@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Import Parties</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/tally" class="active">Tally</a>
+    </div>
+    <div class="right">
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Import Parties from Tally</h1>
+    <% if (typeof error !== 'undefined' && error) { %><div class="alert"><%= error %></div><% } %>
+    <form method="post" action="/tally/import/parties" enctype="multipart/form-data" class="form">
+      <div class="form-group">
+        <label>Upload Tally XML</label>
+        <input type="file" name="file" accept=".xml" required>
+      </div>
+      <button type="submit" class="btn">Upload</button>
+    </form>
+  </main>
+</body>
+</html>

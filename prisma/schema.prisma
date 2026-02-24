@@ -1,0 +1,350 @@
+// Prisma schema for Factory ERP
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Branch and settings
+model Branch {
+  id             Int               @id @default(autoincrement())
+  name           String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  settings       Settings?
+  productions    ProductionEntry[]
+  labourPayments LabourPayment[]
+  inventoryRolls InventoryRoll[]
+  threadItems    ThreadItem[]
+  factoryChallans FactoryChallan[]
+  orders         Order[]
+  vendors        Vendor[]
+  storageLocations StorageLocation[]
+  ledgerEntries  LedgerEntry[]
+  tallyExportJobs TallyExportJob[]
+  tallyImportJobs TallyImportJob[]
+  auditLogs      AuditLog[]
+  workers        Worker[]
+  machines       Machine[]
+  departments    Department[]
+  userSessions   UserSession[]
+}
+
+model Settings {
+  id       Int    @id @default(autoincrement())
+  branch   Branch @relation(fields: [branchId], references: [id])
+  branchId Int
+  darkMode Boolean @default(false)
+}
+
+model Department {
+  id           Int         @id @default(autoincrement())
+  name         String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  machines     Machine[]
+  productions  ProductionEntry[]
+  branch       Branch?     @relation(fields: [branchId], references: [id])
+  branchId     Int?
+}
+
+model Machine {
+  id           Int        @id @default(autoincrement())
+  name         String
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  productions  ProductionEntry[]
+  branch       Branch?    @relation(fields: [branchId], references: [id])
+  branchId     Int?
+}
+
+model Worker {
+  id               Int               @id @default(autoincrement())
+  name             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  branch           Branch?           @relation(fields: [branchId], references: [id])
+  branchId         Int?
+  labourPayments   LabourPayment[]
+  productionWorkers ProductionWorker[]
+}
+
+model ProductionEntry {
+  id            Int       @id @default(autoincrement())
+  date          DateTime
+  shift         String
+  branch        Branch    @relation(fields: [branchId], references: [id])
+  branchId      Int
+  department    Department? @relation(fields: [departmentId], references: [id])
+  departmentId  Int?
+  machine       Machine?  @relation(fields: [machineId], references: [id])
+  machineId     Int?
+  outputQty     Float
+  outputUnit    String
+  rejectionQty  Float?
+  rejectionReason String?
+  amountA       Float?
+  amountB       Float?
+  order         Order?    @relation(fields: [orderId], references: [id])
+  orderId       Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  workers       ProductionWorker[]
+}
+
+model ProductionWorker {
+  id           Int            @id @default(autoincrement())
+  production   ProductionEntry @relation(fields: [productionId], references: [id])
+  productionId Int
+  worker       Worker          @relation(fields: [workerId], references: [id])
+  workerId     Int
+  rateA        Float?
+  rateB        Float?
+}
+
+model LabourPayment {
+  id        Int       @id @default(autoincrement())
+  worker    Worker?   @relation(fields: [workerId], references: [id])
+  workerId  Int?
+  branch    Branch    @relation(fields: [branchId], references: [id])
+  branchId  Int
+  date      DateTime
+  amount    Float
+  mode      String
+  remarks   String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Vendor {
+  id        Int      @id @default(autoincrement())
+  name      String
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+  branchId  Int?
+  payments  VendorPayment[]
+}
+
+model VendorPayment {
+  id         Int     @id @default(autoincrement())
+  vendor     Vendor  @relation(fields: [vendorId], references: [id])
+  vendorId   Int
+  branch     Branch  @relation(fields: [branchId], references: [id])
+  branchId   Int
+  date       DateTime
+  amount     Float
+  mode       String
+  remarks    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  branchId    Int
+  partyName   String
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  items       OrderItem[]
+  productions ProductionEntry[]
+  challans    FactoryChallan[]
+}
+
+model OrderItem {
+  id          Int    @id @default(autoincrement())
+  order       Order  @relation(fields: [orderId], references: [id])
+  orderId     Int
+  description String
+  quantity    Float
+  unitPrice   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FactoryChallan {
+  id         Int      @id @default(autoincrement())
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  branchId   Int
+  number     Int
+  date       DateTime
+  partyName  String
+  status     String
+  order      Order?   @relation(fields: [orderId], references: [id])
+  orderId    Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  items      ChallanItem[]
+}
+
+model ChallanItem {
+  id          Int            @id @default(autoincrement())
+  challan     FactoryChallan @relation(fields: [challanId], references: [id])
+  challanId   Int
+  description String
+  quantity    Float
+  unitPrice   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model InventoryRoll {
+  id         Int       @id @default(autoincrement())
+  branch     Branch    @relation(fields: [branchId], references: [id])
+  branchId   Int
+  rollId     String
+  supplier   String
+  gsm        Float
+  width      Float
+  color      String
+  remaining  Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  movements  StockMovement[]
+}
+
+model StockMovement {
+  id         Int          @id @default(autoincrement())
+  roll       InventoryRoll @relation(fields: [rollIdRef], references: [id])
+  rollIdRef  Int
+  branch     Branch        @relation(fields: [branchId], references: [id])
+  branchId   Int
+  type       String        // IN, OUT, ADJUST
+  quantity   Float
+  date       DateTime
+  reason     String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model ThreadItem {
+  id        Int          @id @default(autoincrement())
+  branch    Branch       @relation(fields: [branchId], references: [id])
+  branchId  Int
+  name      String
+  remaining Float
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  movements ThreadMovement[]
+}
+
+model ThreadMovement {
+  id         Int         @id @default(autoincrement())
+  thread     ThreadItem  @relation(fields: [threadId], references: [id])
+  threadId   Int
+  branch     Branch      @relation(fields: [branchId], references: [id])
+  branchId   Int
+  type       String
+  quantity   Float
+  date       DateTime
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model StorageLocation {
+  id         Int              @id @default(autoincrement())
+  branch     Branch           @relation(fields: [branchId], references: [id])
+  branchId   Int
+  name       String
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  movements  StorageMovement[]
+}
+
+model StorageMovement {
+  id         Int              @id @default(autoincrement())
+  location   StorageLocation  @relation(fields: [locationId], references: [id])
+  locationId Int
+  branch     Branch           @relation(fields: [branchId], references: [id])
+  branchId   Int
+  itemType   String           // ROLL or THREAD
+  itemId     Int
+  quantity   Float
+  date       DateTime
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model LedgerEntry {
+  id         Int      @id @default(autoincrement())
+  branch     Branch   @relation(fields: [branchId], references: [id])
+  branchId   Int
+  type       String
+  date       DateTime
+  description String
+  debit      Float
+  credit     Float
+  balance    Float
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  branch     Branch?  @relation(fields: [branchId], references: [id])
+  branchId   Int?
+  sessionId  String?
+  ip         String?
+  action     String
+  entity     String
+  entityId   Int?
+  before     Json?
+  after      Json?
+  createdAt  DateTime  @default(now())
+}
+
+model TallyExportJob {
+  id        Int      @id @default(autoincrement())
+  branch    Branch   @relation(fields: [branchId], references: [id])
+  branchId  Int
+  type      String
+  filePath  String
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model TallyImportJob {
+  id        Int      @id @default(autoincrement())
+  branch    Branch   @relation(fields: [branchId], references: [id])
+  branchId  Int
+  type      String
+  filePath  String
+  status    String
+  createdAt DateTime @default(now())
+}
+
+model TallyMapping {
+  id          Int      @id @default(autoincrement())
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  branchId    Int
+  mappingType String   // COMPANY, PARTY, LEDGER, ITEM
+  erpId       Int?
+  tallyName   String
+  createdAt   DateTime @default(now())
+}
+
+model UserSession {
+  id          Int      @id @default(autoincrement())
+  sessionId   String
+  userAgent   String
+  ip          String
+  refreshToken String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+}
+
+model LoginHistory {
+  id        Int      @id @default(autoincrement())
+  ip        String
+  userAgent String
+  success   Boolean
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/tally">Tally</a>
+    </div>
+    <div class="right">
+      <label>Branch:</label>
+      <select onchange="location.href='/branch/select/' + this.value;">
+        <% branches.forEach(function(b) { %>
+          <option value="<%= b.id %>" <%= b.id === branchId ? 'selected' : '' %>><%= b.name %></option>
+        <% }) %>
+      </select>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Dashboard</h1>
+    <div class="cards">
+      <div class="card">
+        <h2>Production Entries</h2>
+        <p class="count"><%= prodCount %></p>
+      </div>
+      <div class="card">
+        <h2>Labour Payments</h2>
+        <p class="count"><%= labourCount %></p>
+      </div>
+      <div class="card">
+        <h2>Inventory Rolls</h2>
+        <p class="count"><%= invCount %></p>
+      </div>
+      <div class="card">
+        <h2>Challans</h2>
+        <p class="count"><%= challanCount %></p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

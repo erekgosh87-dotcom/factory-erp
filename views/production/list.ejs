@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Production Entries</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production" class="active">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/tally">Tally</a>
+    </div>
+    <div class="right">
+      <label>Branch:</label>
+      <select onchange="location.href='/branch/select/' + this.value;">
+        <% branches.forEach(function(b) { %>
+          <option value="<%= b.id %>" <%= b.id === branchId ? 'selected' : '' %>><%= b.name %></option>
+        <% }); %>
+      </select>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Production Entries</h1>
+    <a href="/production/new" class="btn">New Production</a>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Shift</th>
+          <th>Department</th>
+          <th>Machine</th>
+          <th>Output</th>
+          <th>Rejection</th>
+          <th>Workers</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% productions.forEach(function(p) { %>
+        <tr>
+          <td><%= p.date.toISOString().split('T')[0] %></td>
+          <td><%= p.shift %></td>
+          <td><%= p.department ? p.department.name : '' %></td>
+          <td><%= p.machine ? p.machine.name : '' %></td>
+          <td><%= p.outputQty %> <%= p.outputUnit %></td>
+          <td><%= p.rejectionQty || 0 %></td>
+          <td>
+            <% p.workers.forEach(function(w, index) { %>
+              <%= w.worker.name %><%= index < p.workers.length - 1 ? ', ' : '' %>
+            <% }); %>
+          </td>
+          <td>
+            <form method="post" action="/production/<%= p.id %>/cancel" onsubmit="return confirm('Cancel this entry?');">
+              <button type="submit" class="btn btn-danger">Cancel</button>
+            </form>
+          </td>
+        </tr>
+        <% }); %>
+        <% if (productions.length === 0) { %>
+        <tr><td colspan="8" class="empty">No production entries</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

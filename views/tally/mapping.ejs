@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tally Mapping</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/tally" class="active">Tally</a>
+    </div>
+    <div class="right">
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Tally Mapping</h1>
+    <h2>Existing Mappings</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>ERP ID</th>
+          <th>Tally Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% mappings.forEach(function(m) { %>
+          <tr>
+            <td><%= m.mappingType %></td>
+            <td><%= m.erpId || '' %></td>
+            <td><%= m.tallyName %></td>
+          </tr>
+        <% }); %>
+        <% if (mappings.length === 0) { %>
+          <tr><td colspan="3" class="empty">No mappings</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+    <h2>Add Mapping</h2>
+    <form method="post" action="/tally/mapping" class="form">
+      <div class="form-group">
+        <label>Mapping Type</label>
+        <select name="mappingType" required>
+          <option value="COMPANY">Company</option>
+          <option value="PARTY">Party</option>
+          <option value="LEDGER">Ledger</option>
+          <option value="ITEM">Item</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ERP ID (optional)</label>
+        <input type="number" name="erpId">
+      </div>
+      <div class="form-group">
+        <label>Tally Name</label>
+        <input type="text" name="tallyName" required>
+      </div>
+      <button type="submit" class="btn">Save</button>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inventory Rolls</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory" class="active">Inventory</a>
+      <a href="/tally">Tally</a>
+    </div>
+    <div class="right">
+      <label>Branch:</label>
+      <select onchange="location.href='/branch/select/' + this.value;">
+        <% branches.forEach(function(b) { %>
+          <option value="<%= b.id %>" <%= b.id === branchId ? 'selected' : '' %>><%= b.name %></option>
+        <% }); %>
+      </select>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Inventory Rolls</h1>
+    <a href="/inventory/new" class="btn">Add Roll</a>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Roll ID</th>
+          <th>Supplier</th>
+          <th>GSM</th>
+          <th>Width</th>
+          <th>Color</th>
+          <th>Remaining</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rolls.forEach(function(r) { %>
+        <tr>
+          <td><%= r.rollId %></td>
+          <td><%= r.supplier %></td>
+          <td><%= r.gsm %></td>
+          <td><%= r.width %></td>
+          <td><%= r.color %></td>
+          <td><%= r.remaining %></td>
+        </tr>
+        <% }); %>
+        <% if (rolls.length === 0) { %>
+        <tr><td colspan="6" class="empty">No rolls</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

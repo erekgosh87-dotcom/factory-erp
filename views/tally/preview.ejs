@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Preview Parties</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/tally" class="active">Tally</a>
+    </div>
+    <div class="right">
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>Preview Imported Parties</h1>
+    <form method="post" action="/tally/import/parties/apply" class="form">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Party Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% parties.forEach(function(name) { %>
+          <tr>
+            <td><input type="checkbox" name="names" value="<%= name %>" checked></td>
+            <td><%= name %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+      <button type="submit" class="btn">Import Selected</button>
+    </form>
+  </main>
+</body>
+</html>

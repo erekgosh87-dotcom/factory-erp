@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>New Production Entry</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="left">
+      <a href="/">Dashboard</a>
+      <a href="/production" class="active">Production</a>
+      <a href="/labour">Labour</a>
+      <a href="/inventory">Inventory</a>
+      <a href="/tally">Tally</a>
+    </div>
+    <div class="right">
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h1>New Production Entry</h1>
+    <% if (error) { %>
+      <div class="alert"><%= error %></div>
+    <% } %>
+    <form method="post" action="/production/new" class="form">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label>Shift</label>
+        <select name="shift" required>
+          <option value="Day">Day</option>
+          <option value="Night">Night</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Department</label>
+        <select name="departmentId">
+          <option value="">--None--</option>
+          <% departments.forEach(function(dept) { %>
+            <option value="<%= dept.id %>"><%= dept.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Machine</label>
+        <select name="machineId">
+          <option value="">--None--</option>
+          <% machines.forEach(function(machine) { %>
+            <option value="<%= machine.id %>"><%= machine.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Output Quantity</label>
+        <input type="number" step="0.01" name="outputQty" required>
+      </div>
+      <div class="form-group">
+        <label>Output Unit</label>
+        <input type="text" name="outputUnit" value="pcs" required>
+      </div>
+      <div class="form-group">
+        <label>Rejection Quantity</label>
+        <input type="number" step="0.01" name="rejectionQty">
+      </div>
+      <div class="form-group">
+        <label>Rejection Reason</label>
+        <input type="text" name="rejectionReason">
+      </div>
+      <div class="form-group">
+        <label>Workers</label>
+        <div class="checkbox-group">
+          <% workers.forEach(function(worker) { %>
+            <label><input type="checkbox" name="workerIds" value="<%= worker.id %>"> <%= worker.name %></label>
+          <% }); %>
+        </div>
+      </div>
+      <button type="submit" class="btn">Save</button>
+    </form>
+  </main>
+</body>
+</html>
